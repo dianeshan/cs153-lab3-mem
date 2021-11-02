@@ -88,6 +88,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p->priority = 10;   // lab 2
 
   release(&ptable.lock);
 
@@ -323,17 +324,28 @@ void
 scheduler(void)
 {
   struct proc *p;
+  int highestpriority;
+  int flag;
+  int temp;
   struct cpu *c = mycpu();
   c->proc = 0;
   
   for(;;){
     // Enable interrupts on this processor.
     sti();
-
+   highestpriority = 32;
+   flag = 0;
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
+        continue;
+      if(p->priority < highestpriority){
+        highestpriority = p->priority;
+      }
+    }
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state != RUNNABLE || p->priority != highestpriority)
         continue;
 
       // Switch to chosen process.  It is the process's job
@@ -345,11 +357,25 @@ scheduler(void)
 
       swtch(&(c->scheduler), p->context);
       switchkvm();
-
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       c->proc = 0;
     }
+    /*
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->priority  == highestpriority && flag == 0){
+        if(p->priority < 32){
+          temp = p->priority + 1;
+          setpriority(temp);
+        }
+        flag = 1;
+      }
+      else if (p->priority != 1){
+        temp = p->priority - 1;
+        setpriority(temp);
+      }
+    }
+    */
     release(&ptable.lock);
 
   }
@@ -532,3 +558,13 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+
+/* lab 2 start*/
+void
+setpriority(int priority)
+{
+  //is the current process calling this system call the myproc()?
+  myproc()->priority = priority;
+}
+/* lab 2 ends*/
