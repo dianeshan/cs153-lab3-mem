@@ -100,3 +100,9 @@ sys_setpriority(void)  //lab 2
   setpriority(priority);
   //return 0;
 }
+
+int
+sys_getpriority(void)  //lab 2
+{
+  return getpriority();
+}

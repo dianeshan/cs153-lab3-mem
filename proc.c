@@ -564,4 +564,10 @@ setpriority(int priority)
   //is the current process calling this system call the myproc()?
   myproc()->priority = priority;
 }
+
+int
+getpriority(void)
+{
+  return myproc()->priority;
+}
 /* lab 2 ends*/
