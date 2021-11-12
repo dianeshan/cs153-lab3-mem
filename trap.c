@@ -77,6 +77,21 @@ trap(struct trapframe *tf)
             cpuid(), tf->cs, tf->eip);
     lapiceoi();
     break;
+  //lab 3
+  case T_PGFLT: ;
+    uint r = rcr2();
+    if (r > KERNBASE - 1) {
+      cprintf("");
+      exit();
+    }
+    r = PGROUNDDOWN(r);
+    if (allocuvm(myproc()->pgdir, r, r + PGSIZE) == 0) {
+      cprintf("T_PGFLT: allocuvm failed\n");
+      exit();
+    }
+    myproc()->pages++;
+    cprintf("T_PGFLT: allocuvm succeeded. Pages allocated: %d\n", myproc()->pages);
+    break;
 
   //PAGEBREAK: 13
   default:
