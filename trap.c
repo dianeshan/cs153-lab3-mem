@@ -79,13 +79,13 @@ trap(struct trapframe *tf)
     break;
   //lab 3
   case T_PGFLT: ;
-    uint r = rcr2();
+    uint r = rcr2(); //check the address that caused the page fault
     if (r > KERNBASE - 1) {
-      cprintf("");
+      cprintf("address greater than KERNBASE");
       exit();
     }
-    r = PGROUNDDOWN(r);
-    if (allocuvm(myproc()->pgdir, r, r + PGSIZE) == 0) {
+    r = PGROUNDDOWN(r); //used to obtain page number
+    if (allocuvm(myproc()->pgdir, r, r + PGSIZE) == 0) { //if you allocate the page and get 0 then failed
       cprintf("T_PGFLT: allocuvm failed\n");
       exit();
     }

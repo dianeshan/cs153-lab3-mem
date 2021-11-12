@@ -75,7 +75,7 @@ exec(char *path, char **argv)
   // clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
   //sp = sz;
   sp = KERNBASE - 1; //address of the top word in the stack page
-  curproc->pages = 1; 
+  curproc->pages = 1; //to keep track of the size of the stack
 
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {
